@@ -1,0 +1,13 @@
+name: lessr
+channels:
+  - pytorch
+  - conda-forge
+  - dglteam
+  - defaults
+dependencies:
+  - python=3.7.6=h0371630_2
+  - cudatoolkit=10.1.243=h6bb024c_0
+  - dgl-cuda10.1=0.4.2=py37_0
+  - numpy=1.18.1=py37h4f9e942_0
+  - pandas=0.25.3=py37he6710b0_0
+  - pytorch=1.4.0=py3.7_cuda10.1.243_cudnn7.6.3_0
