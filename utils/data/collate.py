@@ -16,7 +16,7 @@ def seq_to_eop_multigraph(seq):
     iid2nid = {iid: i for i, iid in enumerate(items)}
     num_nodes = len(items)
 
-    g = dgl.DGLGraph(multigraph=True)
+    g = dgl.DGLGraph()
     g.add_nodes(num_nodes)
     g.ndata['iid'] = items
 

@@ -76,6 +76,7 @@ class TrainRunner:
         max_hit = 0
         bad_counter = 0
         t = time.time()
+        mean_loss = 0
         for epoch in range(epochs):
             self.model.train()
             for batch in self.train_loader:
@@ -85,12 +86,13 @@ class TrainRunner:
                 loss = self.criterion(logits, labels)
                 loss.backward()
                 self.optimizer.step()
-
+                mean_loss += loss / log_interval
                 if self.batch > 0 and self.batch % log_interval == 0:
                     print(
-                        f'Batch {self.batch}: Loss = {loss.item():.4f}, Time Elapsed = {time.time() - t:.2f}s'
+                        f'Batch {self.batch}: Loss = {mean_loss.item():.4f}, Time Elapsed = {time.time() - t:.2f}s'
                     )
                     t = time.time()
+                    mean_loss = 0
                 self.batch += 1
 
             mrr, hit = evaluate(self.model, self.test_loader, self.device)

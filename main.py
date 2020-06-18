@@ -79,7 +79,7 @@ train_loader = DataLoader(
 
 test_loader = DataLoader(
     test_set,
-    batch_size=args.batch_size * 2,
+    batch_size=args.batch_size,
     shuffle=False,
     num_workers=args.num_workers,
     collate_fn=collate_fn,

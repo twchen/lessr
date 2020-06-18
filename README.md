@@ -1,11 +1,12 @@
 # LESSR
-A PyTorch implementation of LESSR (Lossless Edge-order preserving aggregation and Shortcut graph attention for Session-based Recommendation).
+A PyTorch implementation of LESSR (**L**ossless **E**dge-order preserving aggregation and **S**hortcut graph attention for **S**ession-based **R**ecommendation) from the paper:  
+_Handling Information Loss of Graph Neural Networks for Session-based Recommendation, Tianwen Chen and Raymong Chi-Wing Wong, KDD '20_
 
-# Requirements
+## Requirements
 - CUDA 10.1
 - Anaconda
 
-# Usage
+## Usage
 1. Create a conda environment with the required packages.
     ```sh
     conda env create -f packages.yml
@@ -35,3 +36,14 @@ A PyTorch implementation of LESSR (Lossless Edge-order preserving aggregation an
     ```sh
     python main.py
     ```
+
+## Citation
+If you use the code, please cite our paper:
+```
+@inproceedings{chen2020lessr,
+    title="Handling Information Loss of Graph Neural Networks for Session-based Recommendation",
+    author="Tianwen {Chen} and Raymond Chi-Wing {Wong}",
+    booktitle="Proceedings of the 26th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD '20)",
+    year="2020"
+}
+```

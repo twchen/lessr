@@ -39,13 +39,12 @@ else:
     from pandas import Timedelta
     from utils.data.preprocess import preprocess_gowalla_lastfm
 
+    csv_file = args.filepath
     if args.dataset == 'gowalla':
-        csv_file = args.filepath
         usecols = [0, 1, 4]
         interval = Timedelta(days=1)
         n = 30000
     else:
-        csv_file = args.filepath
         usecols = [0, 1, 2]
         interval = Timedelta(hours=8)
         n = 40000

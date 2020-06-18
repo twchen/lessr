@@ -16,18 +16,19 @@ def create_index(sessions):
 class AugmentedDataset:
     def __init__(self, sessions, sort_by_length=True):
         self.sessions = sessions
-        index = create_index(sessions)
-        self.df_index = pd.DataFrame(index, columns=['sessionId', 'labelIdx'])
+        index = create_index(sessions)  # columns: sessionId, labelIndex
         if sort_by_length:
-            self.df_index.sort_values('labelIdx', inplace=True, ascending=False)
-            self.df_index.reset_index(drop=True, inplace=True)
+            # sort by labelIndex in descending order
+            ind = np.argsort(index[:, 1])[::-1]
+            index = index[ind]
+        self.index = index
 
     def __getitem__(self, idx):
-        sid, lidx = self.df_index.iloc[idx]
+        sid, lidx = self.index[idx]
         seq = self.sessions[sid][:lidx]
         label = self.sessions[sid][lidx]
         return seq, label
 
     def __len__(self):
-        return len(self.df_index)
+        return len(self.index)
 
