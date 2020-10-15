@@ -18,7 +18,7 @@ _Handling Information Loss of Graph Neural Networks for Session-based Recommenda
     ```
 
 3. Download and extract the datasets.
-    - [Diginetica](https://cikm2016.cs.iupui.edu/cikm-cup/)
+    - [Diginetica](https://competitions.codalab.org/competitions/11161)
     - [Gowalla](https://snap.stanford.edu/data/loc-Gowalla.html)
     - [Last.fm](http://ocelma.net/MusicRecommendationDataset/lastfm-1K.html)
 
