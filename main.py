@@ -6,6 +6,9 @@ parser.add_argument(
 )
 parser.add_argument('--embedding-dim', type=int, default=32, help='the embedding size')
 parser.add_argument('--num-layers', type=int, default=3, help='the number of layers')
+parser.add_argument(
+    '--feat-drop', type=float, default=0.2, help='the dropout ratio for features'
+)
 parser.add_argument('--lr', type=float, default=1e-3, help='the learning rate')
 parser.add_argument(
     '--batch-size', type=int, default=512, help='the batch size for training'
@@ -16,13 +19,13 @@ parser.add_argument(
 parser.add_argument(
     '--weight-decay',
     type=float,
-    default=1e-3,
+    default=1e-4,
     help='the parameter for L2 regularization',
 )
 parser.add_argument(
     '--patience',
     type=int,
-    default=3,
+    default=2,
     help='the number of epochs that the performance does not improves after which the training stops',
 )
 parser.add_argument(
@@ -50,9 +53,12 @@ print(args)
 from pathlib import Path
 import torch as th
 from torch.utils.data import DataLoader
-from utils.data.preprocess import read_dataset
-from utils.data.dataset import AugmentedDataset
-from utils.data.collate import collate_fn
+from utils.data.dataset import read_dataset, AugmentedDataset
+from utils.data.collate import (
+    seq_to_eop_multigraph,
+    seq_to_shortcut_graph,
+    collate_fn_factory,
+)
 from utils.train import TrainRunner
 from lessr import LESSR
 
@@ -67,6 +73,11 @@ if args.valid_split is not None:
 
 train_set = AugmentedDataset(train_sessions)
 test_set = AugmentedDataset(test_sessions)
+
+if args.num_layers > 1:
+    collate_fn = collate_fn_factory(seq_to_eop_multigraph, seq_to_shortcut_graph)
+else:
+    collate_fn = collate_fn_factory(seq_to_eop_multigraph)
 
 train_loader = DataLoader(
     train_set,
@@ -85,9 +96,10 @@ test_loader = DataLoader(
     collate_fn=collate_fn,
 )
 
-model = LESSR(num_items, args.embedding_dim, args.num_layers)
-device = th.device('cuda')
+model = LESSR(num_items, args.embedding_dim, args.num_layers, feat_drop=args.feat_drop)
+device = th.device('cuda' if th.cuda.is_available() else 'cpu')
 model = model.to(device)
+print(model)
 
 runner = TrainRunner(
     model,
@@ -100,4 +112,6 @@ runner = TrainRunner(
 )
 
 print('start training')
-runner.train(args.epochs, args.log_interval)
+mrr, hit = runner.train(args.epochs, args.log_interval)
+print('MRR@20\tHR@20')
+print(f'{mrr * 100:.3f}%\t{hit * 100:.3f}%')

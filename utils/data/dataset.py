@@ -13,6 +13,20 @@ def create_index(sessions):
     return idx
 
 
+def read_sessions(filepath):
+    sessions = pd.read_csv(filepath, sep='\t', header=None, squeeze=True)
+    sessions = sessions.apply(lambda x: list(map(int, x.split(',')))).values
+    return sessions
+
+
+def read_dataset(dataset_dir):
+    train_sessions = read_sessions(dataset_dir / 'train.txt')
+    test_sessions = read_sessions(dataset_dir / 'test.txt')
+    with open(dataset_dir / 'num_items.txt', 'r') as f:
+        num_items = int(f.readline())
+    return train_sessions, test_sessions, num_items
+
+
 class AugmentedDataset:
     def __init__(self, sessions, sort_by_length=True):
         self.sessions = sessions
@@ -31,4 +45,3 @@ class AugmentedDataset:
 
     def __len__(self):
         return len(self.index)
-

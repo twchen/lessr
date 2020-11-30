@@ -22,14 +22,14 @@ required.add_argument(
 )
 optional.add_argument(
     '-t',
-    '--target-dir',
-    default='datasets/',
-    help='the folder used to saved the preprocessed dataset sub-folder',
+    '--dataset-dir',
+    default='datasets/{dataset}',
+    help='the folder to save the preprocessed dataset',
 )
 parser._action_groups.append(optional)
 args = parser.parse_args()
 
-dataset_dir = Path(args.target_dir) / args.dataset
+dataset_dir = Path(args.dataset_dir.format(dataset=args.dataset))
 
 if args.dataset == 'diginetica':
     from utils.data.preprocess import preprocess_diginetica

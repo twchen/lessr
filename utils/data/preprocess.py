@@ -106,12 +106,6 @@ def save_sessions(df, filepath):
     sessions.to_csv(filepath, sep='\t', header=False, index=False)
 
 
-def read_sessions(filepath):
-    sessions = pd.read_csv(filepath, sep='\t', header=None, squeeze=True)
-    sessions = sessions.apply(lambda x: list(map(int, x.split(',')))).values
-    return sessions
-
-
 def save_dataset(dataset_dir, df_train, df_test):
     # filter items in test but not in train
     df_test = df_test[df_test.itemId.isin(df_train.itemId.unique())]
@@ -134,14 +128,6 @@ def save_dataset(dataset_dir, df_train, df_test):
     num_items = len(uniques)
     with open(dataset_dir / 'num_items.txt', 'w') as f:
         f.write(str(num_items))
-
-
-def read_dataset(dataset_dir):
-    train_sessions = read_sessions(dataset_dir / 'train.txt')
-    test_sessions = read_sessions(dataset_dir / 'test.txt')
-    with open(dataset_dir / 'num_items.txt', 'r') as f:
-        num_items = int(f.readline())
-    return train_sessions, test_sessions, num_items
 
 
 def preprocess_diginetica(dataset_dir, csv_file):
