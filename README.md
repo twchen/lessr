@@ -24,7 +24,7 @@ _Handling Information Loss of Graph Neural Networks for Session-based Recommenda
     - [Gowalla](https://snap.stanford.edu/data/loc-Gowalla.html)
     - [Last.fm](http://ocelma.net/MusicRecommendationDataset/lastfm-1K.html)
 
-3. Preprocess the datasets using `preprocess.py`.  
+3. Preprocess the datasets using [preprocess.py](preprocess.py).  
     For example, to preprocess the *Diginetica* dataset, extract the file *train-item-views.csv* to the folder `datasets/` and run the following command:
     ```sh
     python preprocess.py -d diginetica -f datasets/train-item-views.csv
@@ -35,12 +35,12 @@ _Handling Information Loss of Graph Neural Networks for Session-based Recommenda
     python preprocess.py -h
     ```
 
-4. Train the model using `main.py`.  
+4. Train the model using [main.py](main.py).  
     If no arguments are passed to `main.py`, it will train a model using a sample dataset with default hyperparameters.
     ```sh
     python main.py
     ```
-    The commands with suggested hyperparameters to train models on the different datasets are as follows:
+    The commands to train LESSR with suggested hyperparameters on different datasets are as follows:
     ```sh
     python main.py --dataset-dir datasets/diginetica --embedding-dim 32 --num-layers 4
     python main.py --dataset-dir datasets/gowalla --embedding-dim 64 --num-layers 4
@@ -57,8 +57,8 @@ _Handling Information Loss of Graph Neural Networks for Session-based Recommenda
         - `num_items.txt`: This file contains a single integer which is the number of items in the dataset.
         - `train.txt`: This file contains all the training sessions.
         - `test.txt`: This file contains all the test sessions.
-    3. Each line of `train.txt` and `test.txt` represents a session, which is a list of item IDs separated by commas. Note the item IDs must in the range of `[0, num_items)`.
-    4. See the folder `datasets/sample` for an example of a dataset.
+    3. Each line of `train.txt` and `test.txt` represents a session, which is a list of item IDs separated by commas. Note the item IDs must be in the range of `[0, num_items)`.
+    4. See the folder [datasets/sample](datasets/sample) for an example of a dataset.
 
 ## Citation
 If you use our code in your research, please cite our paper:

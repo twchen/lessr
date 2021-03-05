@@ -95,8 +95,7 @@ class AttnReadout(nn.Module):
         self.fc_e = nn.Linear(hidden_dim, 1, bias=False)
         self.fc_out = (
             nn.Linear(input_dim, output_dim, bias=False)
-            if output_dim != input_dim
-            else None
+            if output_dim != input_dim else None
         )
         self.activation = activation
 

@@ -23,6 +23,11 @@ parser.add_argument(
     help='the parameter for L2 regularization',
 )
 parser.add_argument(
+    '--Ks',
+    default='10,20',
+    help='the values of K in evaluation metrics, separated by commas',
+)
+parser.add_argument(
     '--patience',
     type=int,
     default=2,
@@ -49,7 +54,6 @@ parser.add_argument(
 args = parser.parse_args()
 print(args)
 
-
 from pathlib import Path
 import torch as th
 from torch.utils.data import DataLoader
@@ -63,6 +67,7 @@ from utils.train import TrainRunner
 from lessr import LESSR
 
 dataset_dir = Path(args.dataset_dir)
+args.Ks = [int(K) for K in args.Ks.split(',')]
 print('reading dataset')
 train_sessions, test_sessions, num_items = read_dataset(dataset_dir)
 
@@ -109,9 +114,8 @@ runner = TrainRunner(
     lr=args.lr,
     weight_decay=args.weight_decay,
     patience=args.patience,
+    Ks=args.Ks,
 )
 
 print('start training')
-mrr, hit = runner.train(args.epochs, args.log_interval)
-print('MRR@20\tHR@20')
-print(f'{mrr * 100:.3f}%\t{hit * 100:.3f}%')
+runner.train(args.epochs, args.log_interval)

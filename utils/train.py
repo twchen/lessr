@@ -1,4 +1,5 @@
 import time
+from collections import defaultdict
 
 import torch as th
 from torch import nn, optim
@@ -26,23 +27,38 @@ def prepare_batch(batch, device):
     return inputs_gpu, labels_gpu
 
 
-def evaluate(model, data_loader, device, cutoff=20):
+def evaluate(model, data_loader, device, Ks=[20]):
     model.eval()
-    mrr = 0
-    hit = 0
     num_samples = 0
+    max_K = max(Ks)
+    results = defaultdict(float)
     with th.no_grad():
         for batch in data_loader:
             inputs, labels = prepare_batch(batch, device)
             logits = model(*inputs)
             batch_size = logits.size(0)
             num_samples += batch_size
-            topk = logits.topk(k=cutoff)[1]
+            topk = th.topk(logits, k=max_K, sorted=True)[1]
             labels = labels.unsqueeze(-1)
-            hit_ranks = th.where(topk == labels)[1] + 1
-            hit += hit_ranks.numel()
-            mrr += hit_ranks.float().reciprocal().sum().item()
-    return mrr / num_samples, hit / num_samples
+            for K in Ks:
+                hit_ranks = th.where(topk[:, :K] == labels)[1] + 1
+                hit_ranks = hit_ranks.float().cpu()
+                results[f'HR@{K}'] += hit_ranks.numel()
+                results[f'MRR@{K}'] += hit_ranks.reciprocal().sum().item()
+                results[f'NDCG@{K}'] += th.log2(1 + hit_ranks).reciprocal().sum().item()
+    for metric in results:
+        results[metric] /= num_samples
+    return results
+
+
+def print_results(results, epochs=None):
+    print('Metric\t' + '\t'.join(results.keys()))
+    print(
+        'Value\t' +
+        '\t'.join([f'{round(val * 100, 2):.2f}' for val in results.values()])
+    )
+    if epochs is not None:
+        print('Epoch\t' + '\t'.join([str(epochs[metric]) for metric in results]))
 
 
 class TrainRunner:
@@ -55,6 +71,7 @@ class TrainRunner:
         lr=1e-3,
         weight_decay=0,
         patience=3,
+        Ks=[20],
     ):
         self.model = model
         if weight_decay > 0:
@@ -68,10 +85,11 @@ class TrainRunner:
         self.epoch = 0
         self.batch = 0
         self.patience = patience
+        self.Ks = Ks
 
     def train(self, epochs, log_interval=100):
-        max_mrr = 0
-        max_hit = 0
+        max_results = defaultdict(float)
+        max_epochs = defaultdict(int)
         bad_counter = 0
         t = time.time()
         mean_loss = 0
@@ -93,17 +111,28 @@ class TrainRunner:
                     mean_loss = 0
                 self.batch += 1
 
-            mrr, hit = evaluate(self.model, self.test_loader, self.device)
+            curr_results = evaluate(
+                self.model, self.test_loader, self.device, Ks=self.Ks
+            )
 
-            print(f'Epoch {self.epoch}: MRR = {mrr * 100:.3f}%, Hit = {hit * 100:.3f}%')
+            print(f'\nEpoch {self.epoch}:')
+            print_results(curr_results)
 
-            if mrr < max_mrr and hit < max_hit:
+            any_better_result = False
+            for metric in curr_results:
+                if curr_results[metric] > max_results[metric]:
+                    max_results[metric] = curr_results[metric]
+                    max_epochs[metric] = self.epoch
+                    any_better_result = True
+
+            if any_better_result:
+                bad_counter = 0
+            else:
                 bad_counter += 1
                 if bad_counter == self.patience:
                     break
-            else:
-                bad_counter = 0
-            max_mrr = max(max_mrr, mrr)
-            max_hit = max(max_hit, hit)
+
             self.epoch += 1
-        return max_mrr, max_hit
+        print('\nBest results')
+        print_results(max_results, max_epochs)
+        return max_results
