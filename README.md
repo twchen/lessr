@@ -61,7 +61,7 @@ _Handling Information Loss of Graph Neural Networks for Session-based Recommenda
     4. See the folder [datasets/sample](datasets/sample) for an example of a dataset.
 
 ## Citation
-If you use our code in your research, please cite our paper:
+If you use our code in your research, please cite our [paper](http://home.cse.ust.hk/~raywong/paper/kdd20-informationLoss-GNN.pdf):
 ```
 @inproceedings{chen2020lessr,
     title="Handling Information Loss of Graph Neural Networks for Session-based Recommendation",
