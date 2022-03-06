@@ -24,7 +24,7 @@ def seq_to_eop_multigraph(seq):
         src = th.LongTensor([])
         dst = th.LongTensor([])
     g = dgl.graph((src, dst), num_nodes=num_nodes)
-    g.ndata['iid'] = th.from_numpy(items)
+    g.ndata['iid'] = th.tensor(items, dtype=th.long)
     label_last(g, iid2nid[seq[-1]])
     return g
 
